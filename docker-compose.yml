@@ -6,16 +6,16 @@ services:
     ports:
       - "${PORT:-3000}:3000"
     environment:
+      - NODE_ENV=local
       - DATABASE_HOST=postgres
       - DATABASE_PORT=5432
       - DATABASE_USER=postgres
       - DATABASE_PASSWORD=postgres
-      - DATABASE_NAME=postgres
+      - DATABASE_NAME=audit
     depends_on:
       - postgres
     volumes:
       - .:/usr/src/app
-      - /usr/src/app/node_modules
     command: npm run start:dev
 
   postgres:
@@ -25,9 +25,9 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=postgres
+      - POSTGRES_DB=audit
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - ./tmp/postgres_data:/var/lib/postgresql/data
 
 volumes:
   postgres_data: 

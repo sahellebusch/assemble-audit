@@ -4,7 +4,9 @@ WORKDIR /usr/src/app
 
 ADD package.json package-lock.json /usr/src/app/
 
-RUN npm install
+# Install dependencies including class-validator and class-transformer
+RUN npm install && \
+  npm install class-validator class-transformer @nestjs/swagger swagger-ui-express
 
 COPY . .
 
