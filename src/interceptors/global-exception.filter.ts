@@ -4,6 +4,7 @@ import {
   ExceptionFilter,
   HttpException,
   HttpStatus,
+  InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
 import { Response } from 'express';
@@ -18,20 +19,20 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
     // If it's already an HTTP exception, let it pass through
     if (exception instanceof HttpException) {
-      this.logger.error(exception);
-      return response
-        .status(exception.getStatus())
-        .json(exception.getResponse());
+      const status = exception.getStatus();
+
+      if (status >= 300 && status < 500) {
+        return response
+          .status(exception.getStatus())
+          .json(exception.getResponse());
+      }
     }
 
     // Log and wrap unhandled errors
     this.logger.error(exception);
 
-    response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-      statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      message: 'Internal server error',
-      error: exception.name,
-      detail: exception.message,
-    });
+    response
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .send(new InternalServerErrorException(exception.message));
   }
 }

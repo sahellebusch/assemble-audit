@@ -40,22 +40,7 @@ export class AuditV1Controller {
   async getAudit(@Param('id') id: string): Promise<AuditResponseDto> {
     try {
       const audit = await this.getService.execute(id);
-      return {
-        id: audit.uuid,
-        assignedTo: audit.assignedTo,
-        dueDate: audit.dueDate,
-        status: audit.status,
-        lineItems: audit.lineItems.map((item) => ({
-          id: item.id,
-          prompt: item.text,
-          type: item.type,
-          response: item.response?.result ?? null,
-          comment: item.response?.comment ?? null,
-          answeredAt: item.response?.answeredAt ?? null,
-        })),
-        createdAt: audit.createdAt,
-        updatedAt: audit.updatedAt,
-      };
+      return AuditResponseDto.from(audit);
     } catch (error) {
       if (error instanceof AuditNotFoundError) {
         throw new NotFoundException(error.message);
