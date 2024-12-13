@@ -6,7 +6,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { AuditStatus } from '../../../domain/enums/audit-status.enum';
+import { AuditStatus } from '../../../domain/enums/audit-status.value-object';
 import { AuditTemplateInstance } from 'src/audit/audit-configuration/infra/db/table/audit-template.instance';
 
 @Entity('audits')
