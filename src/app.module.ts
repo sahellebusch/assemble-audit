@@ -6,6 +6,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { HealthController } from './health/health.controller';
 import databaseConfig from './config/database.config';
 import { envSchema } from './config/env-schema';
+import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
 @Module({
   imports: [
@@ -22,13 +23,17 @@ import { envSchema } from './config/env-schema';
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
-        host: configService.get('database.host'),
-        port: configService.get('database.port'),
-        username: configService.get('database.username'),
-        password: configService.get('database.password'),
-        database: configService.get('database.database'),
+        host: configService.get('DATABASE_HOST'),
+        port: configService.get('DATABASE_PORT'),
+        username: configService.get('DATABASE_USERNAME'),
+        password: configService.get('DATABASE_PASSWORD'),
+        database: configService.get('DATABASE_NAME'),
+        entities: [__dirname + '/**/*.instance{.ts,.js}'],
+        migrations: [__dirname + '/**/migrations/*{.ts,.js}'],
         autoLoadEntities: true,
-        synchronize: configService.get('NODE_ENV') !== 'production',
+        synchronize: true, // TODO: Disabled for production
+        logging: true,
+        namingStrategy: new SnakeNamingStrategy(),
       }),
       inject: [ConfigService],
     }),
