@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { UseCase } from '../../../domain/ports/use-case.port';
-import { Patient } from '../../../domain/ports/ehr-provider.port';
+import { Patient } from '../../../domain/entities/patient.entity';
 import { CernerAdapter } from 'src/ehr/infra/adapters/cerner.adapter';
+import { UseCase } from 'src/ehr/domain/ports/use-case.port';
 
 export interface GetCernerPatientInput {
   patientId: string;

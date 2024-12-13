@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { Patient } from '../../domain/ports/ehr-provider.port';
+import { Patient } from '../../domain/entities/patient.entity';
 import { GetCernerPatientUseCase } from '../use-cases/cerner/get-patient.use-case';
 import { GetEpicPatientUseCase } from '../use-cases/epic/get-patient.use-case';
-import { EHRProviderType } from '../../infra/enums/ehr-provider-type.enum';
+import { EHRProviderType } from '../../infra/types/ehr-provider-type.enum';
 
 @Injectable()
 export class EHRService {
