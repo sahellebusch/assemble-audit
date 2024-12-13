@@ -1,7 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { GlobalExceptionFilter } from './interceptors/global-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -25,11 +26,17 @@ async function bootstrap() {
     .setVersion('1.0')
     .build();
 
+  app.enableVersioning({
+    type: VersioningType.URI,
+  });
+
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
   // Get port from environment variables with fallback
   const port = process.env.PORT || 3000;
+
+  app.useGlobalFilters(new GlobalExceptionFilter());
 
   await app.listen(port);
   console.log(`Application is running on: http://localhost:${port}`);

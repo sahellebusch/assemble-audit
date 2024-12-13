@@ -1,41 +1,40 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  ManyToOne,
-  CreateDateColumn,
-  UpdateDateColumn,
-} from 'typeorm';
-import { AuditTemplateInstance } from 'src/audit/audit-configuration/infra/db/table/audit-template.instance';
-import { AuditStatus } from 'src/audit/audit-execution/domain/types/audit-status.enum';
+import { Column, Entity, PrimaryColumn, OneToMany } from 'typeorm';
+import { AuditStatus } from '../../../domain/types/audit-status.enum';
+import { AuditType } from '../../../domain/types/audit-types.enum';
+import { LineItemInstance } from './line-item.instance';
 
 @Entity('audits')
 export class AuditInstance {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryColumn()
   id: string;
 
-  @ManyToOne(() => AuditTemplateInstance, { eager: true })
-  template: AuditTemplateInstance;
-
-  @Column({
-    type: 'varchar',
-    length: 20,
-    default: AuditStatus.Pending,
-  })
-  status: AuditStatus;
-
-  @Column({ type: 'varchar', length: 255, nullable: true })
+  @Column()
   assignedTo: string;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column()
   dueDate: Date;
 
-  @Column({ type: 'json', nullable: true })
-  answers: Record<string, any>;
+  @Column({ type: 'enum', enum: AuditType })
+  auditType: AuditType;
 
-  @CreateDateColumn({ type: 'timestamp' })
+  @Column({ type: 'enum', enum: AuditStatus })
+  status: AuditStatus;
+
+  @OneToMany(() => LineItemInstance, (lineItem) => lineItem.audit, {
+    cascade: true,
+  })
+  lineItems: LineItemInstance[];
+
+  @Column('jsonb', { nullable: true })
+  ehrData?: {
+    patient: any;
+    conditions: any[];
+    providerId: string;
+  };
+
+  @Column()
   createdAt: Date;
 
-  @UpdateDateColumn({ type: 'timestamp' })
+  @Column()
   updatedAt: Date;
 }

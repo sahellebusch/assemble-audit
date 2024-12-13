@@ -7,6 +7,7 @@ import { HealthController } from './health/health.controller';
 import databaseConfig from './config/database.config';
 import { envSchema } from './config/env-schema';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
+import { AuditExecutionModule } from './audit/audit-execution/audit-execution.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
     }),
     TerminusModule,
     HttpModule,
+    AuditExecutionModule,
   ],
   controllers: [HealthController],
 })

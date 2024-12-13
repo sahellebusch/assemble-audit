@@ -1,5 +1,5 @@
 export enum AuditStatus {
   Pending = 'pending',
-  InProgress = 'in_progress',
+  InProgress = 'in-progress',
   Completed = 'completed',
 }
