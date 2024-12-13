@@ -1,4 +1,4 @@
 export enum EHRProviderType {
-  EPIC = 'EPIC',
-  CERNER = 'CERNER',
+  EPIC = 'epic',
+  CERNER = 'cerner',
 }
