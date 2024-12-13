@@ -9,8 +9,8 @@ services:
       - NODE_ENV=local
       - DATABASE_HOST=postgres
       - DATABASE_PORT=5432
-      - DATABASE_USER=postgres
-      - DATABASE_PASSWORD=postgres
+      - DATABASE_USERNAME=username
+      - DATABASE_PASSWORD=password
       - DATABASE_NAME=audit
     depends_on:
       - postgres
@@ -19,12 +19,12 @@ services:
     command: npm run start:dev
 
   postgres:
-    image: postgres:15-alpine
+    image: postgres:17-alpine
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=username
+      - POSTGRES_PASSWORD=password
       - POSTGRES_DB=audit
     volumes:
       - ./tmp/postgres_data:/var/lib/postgresql/data
