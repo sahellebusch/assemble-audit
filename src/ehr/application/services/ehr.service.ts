@@ -1,14 +1,17 @@
-import { Injectable } from '@nestjs/common';
-import { EHRProviderPort } from '../../domain/ports/ehr-provider.port';
+import { Inject, Injectable } from '@nestjs/common';
+import {
+  EHR_PROVIDER,
+  EHRProviderPort,
+} from '../../domain/ports/ehr-provider.port';
 import { Patient } from '../../domain/entities/patient.entity';
 import { Condition } from '../../domain/entities/condition.entity';
-import { EHRProviderType } from 'src/ehr/infra/types/ehr-provider-type.enum';
+import { EHRProviderType } from '../../infra/types/ehr-provider-type.enum';
 
 @Injectable()
 export class EHRService {
   constructor(
-    private readonly cernerProvider: EHRProviderPort,
-    private readonly epicProvider: EHRProviderPort,
+    @Inject(EHR_PROVIDER) private readonly cernerProvider: EHRProviderPort,
+    @Inject(EHR_PROVIDER) private readonly epicProvider: EHRProviderPort,
   ) {}
 
   async getPatient(providerId: string, patientId: string): Promise<Patient> {

@@ -1,17 +1,20 @@
 import { Module } from '@nestjs/common';
-import { EHRService } from './application/services/ehr.service';
-import { GetCernerPatientUseCase } from './application/use-cases/cerner/get-patient.use-case';
-import { GetEpicPatientUseCase } from './application/use-cases/epic/get-patient.use-case';
-import { EpicAdapter } from './infra/adapters/epic.adapter';
+import { EHR_PROVIDER } from './domain/ports/ehr-provider.port';
 import { CernerAdapter } from './infra/adapters/cerner.adapter';
+import { EpicAdapter } from './infra/adapters/epic.adapter';
+import { EHRService } from './application/services/ehr.service';
 
 @Module({
   providers: [
+    {
+      provide: EHR_PROVIDER,
+      useClass: CernerAdapter,
+    },
+    {
+      provide: EHR_PROVIDER,
+      useClass: EpicAdapter,
+    },
     EHRService,
-    EpicAdapter,
-    CernerAdapter,
-    GetCernerPatientUseCase,
-    GetEpicPatientUseCase,
   ],
   exports: [EHRService],
 })
