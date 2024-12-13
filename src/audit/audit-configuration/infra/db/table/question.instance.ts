@@ -1,5 +1,3 @@
-// domain/value-objects/question.value-object.ts
-// infra/db/entities/question.entity.ts
 import {
   Entity,
   PrimaryGeneratedColumn,
