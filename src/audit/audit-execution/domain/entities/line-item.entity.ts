@@ -1,24 +1,22 @@
 import { LineItemType } from '../types/line-item-type.enum';
 
-interface LineItemResponse {
-  result: boolean;
-  comment?: string;
-  answeredAt?: Date;
-}
-
-export class LineItem {
+export class LineItem<T = any> {
   constructor(
     public readonly id: string,
     public readonly text: string,
     public readonly type: LineItemType,
-    public readonly response?: LineItemResponse,
+    public response?: T,
   ) {}
 
+  updateResponse(response: T): void {
+    this.response = response;
+  }
+
   validate(): boolean {
-    return this.response?.result ?? false;
+    return !!this.response;
   }
 
   isAnswered(): boolean {
-    return this.response?.answeredAt != null;
+    return this.response != null;
   }
 }

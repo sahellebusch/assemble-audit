@@ -9,18 +9,16 @@ import { LineItemMapper } from './line-item.mapper';
 export class AuditMapper {
   constructor(private readonly lineItemMapper: LineItemMapper) {}
 
-  toPersistence(audit: AuditBase): AuditInstance {
+  toInstance(audit: AuditBase): AuditInstance {
     const instance = new AuditInstance();
     instance.id = audit.uuid;
     instance.assignedTo = audit.assignedTo;
     instance.dueDate = audit.dueDate;
-    instance.status = audit.status;
+    instance.status = audit.getStatus();
     instance.createdAt = audit.createdAt;
     instance.updatedAt = audit.updatedAt;
 
-    instance.lineItems = audit.lineItems.map((item) =>
-      this.lineItemMapper.toPersistence(item),
-    );
+    instance.lineItems = audit.getLineItems().map(LineItemMapper.toInstance);
 
     if (audit instanceof DocumentationAudit) {
       instance.ehrData = {
@@ -35,9 +33,7 @@ export class AuditMapper {
   }
 
   toDomain(instance: AuditInstance): AuditBase {
-    const lineItems = instance.lineItems.map((item) =>
-      this.lineItemMapper.toDomain(item),
-    );
+    const lineItems = instance.lineItems.map(LineItemMapper.toDomain);
 
     const baseOptions = {
       uuid: instance.id,

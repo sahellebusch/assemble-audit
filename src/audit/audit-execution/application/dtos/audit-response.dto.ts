@@ -21,6 +21,10 @@ export class LineItemResponseDto {
 
   @ApiProperty({ nullable: true })
   answeredAt: Date | null;
+
+  constructor(init?: Partial<LineItemResponseDto>) {
+    Object.assign(this, init);
+  }
 }
 
 export class AuditResponseDto {
@@ -50,15 +54,18 @@ export class AuditResponseDto {
       id: audit.uuid,
       assignedTo: audit.assignedTo,
       dueDate: audit.dueDate,
-      status: audit.status,
-      lineItems: audit.lineItems.map((item) => ({
-        id: item.id,
-        prompt: item.text,
-        type: item.type,
-        response: item.response?.result ?? null,
-        comment: item.response?.comment ?? null,
-        answeredAt: item.response?.answeredAt ?? null,
-      })),
+      status: audit.getStatus(),
+      lineItems: audit.getLineItems().map(
+        (item) =>
+          new LineItemResponseDto({
+            id: item.id,
+            prompt: item.text,
+            type: item.type,
+            response: item.response as boolean,
+            comment: item.response?.comment ?? null,
+            answeredAt: item.response?.answeredAt ?? null,
+          }),
+      ),
       createdAt: audit.createdAt,
       updatedAt: audit.updatedAt,
     };

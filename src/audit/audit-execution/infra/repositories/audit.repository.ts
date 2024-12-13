@@ -25,15 +25,9 @@ export class AuditRepository {
     return this.auditMapper.toDomain(instance);
   }
 
-  async save(audit: AuditBase): Promise<void> {
-    const instance = this.auditMapper.toPersistence(audit);
-    const savedAudit = await this.auditRepository.save(instance);
-
-    // Ensure line items have the audit ID
-    instance.lineItems.forEach((item) => {
-      item.auditId = savedAudit.id;
-    });
-
-    await this.lineItemRepository.save(instance.lineItems);
+  async save(audit: AuditBase): Promise<AuditBase> {
+    const instance = this.auditMapper.toInstance(audit);
+    await this.auditRepository.save(instance);
+    return audit;
   }
 }

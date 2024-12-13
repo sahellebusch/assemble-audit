@@ -10,10 +10,18 @@ import { AuditV1Controller } from './application/controllers/audit.controller';
 import { LineItemMapper } from './infra/mappers/line-item.mapper';
 import { AuditCreateService } from './application/services/audit-create.service';
 import { GetAuditService } from './application/services/get-audit.service';
+import { RecurrencePatternInstance } from './infra/db/table/recurrence-pattern.entity';
+import { AuditUpdateService } from './application/services/audit-update.service';
+import { LineItemRepository } from './infra/repositories/line-item.repository';
+import { RecurrenceSchedulerService } from './application/services/schedulers/recurrence-scheduler.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([AuditInstance, LineItemInstance]),
+    TypeOrmModule.forFeature([
+      AuditInstance,
+      LineItemInstance,
+      RecurrencePatternInstance,
+    ]),
     EHRModule,
   ],
   controllers: [AuditV1Controller],
@@ -24,7 +32,10 @@ import { GetAuditService } from './application/services/get-audit.service';
     LineItemMapper,
     AuditCreateService,
     GetAuditService,
+    AuditUpdateService,
+    LineItemRepository,
+    RecurrenceSchedulerService,
   ],
-  exports: [AuditCreateService],
+  exports: [AuditCreateService, AuditUpdateService],
 })
 export class AuditExecutionModule {}
