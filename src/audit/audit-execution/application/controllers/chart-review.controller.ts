@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Patch,
+  Query,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -22,9 +23,11 @@ import { GetChartReviewService } from '../services/get-chart-review.service';
 import { UpdateChartReviewService } from '../services/update-chart-review.service';
 import { UpdateChartReviewDto } from '../dtos/update-chart-review.dto';
 import { AuditNotFoundError } from '../../domain/errors/audit-not-found.error';
+import { ChartReviewComplianceDto } from '../dtos/chart-review-compliance.dto';
+import { GetChartReviewComplianceQuery } from '../dtos/get-chart-review-compliance.query';
 
 @ApiTags('Chart Review')
-@Controller({ path: 'audits/chart-reviewsd', version: '1' })
+@Controller({ path: 'audits/chart-reviews', version: '1' })
 export class ChartReviewController {
   constructor(
     private readonly createService: CreateChartReviewService,
@@ -108,5 +111,23 @@ export class ChartReviewController {
       }
       throw error;
     }
+  }
+
+  @Get('compliance')
+  @ApiOperation({
+    summary: 'Get chart review compliance rates',
+    description:
+      'Retrieves compliance rates and statistics for chart review audits, including total audits, compliant audits, compliance rate, completed audits and completion rate. Can be filtered by EHR provider.',
+  })
+  @ApiOkResponse({
+    description: 'Compliance statistics retrieved successfully',
+    type: ChartReviewComplianceDto,
+  })
+  async getCompliance(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    @Query() _query: GetChartReviewComplianceQuery,
+  ): Promise<ChartReviewComplianceDto> {
+    // TODO: Implement chart review specific compliance
+    return new ChartReviewComplianceDto(0, 0, 0, 0, 0);
   }
 }
