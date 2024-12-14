@@ -7,7 +7,7 @@ import { HealthController } from './health/health.controller';
 import databaseConfig from './config/database.config';
 import { envSchema } from './config/env-schema';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
-import { AuditExecutionModule } from './audit/audit-execution/audit-execution.module';
+import { AuditModule } from './audit/audit.module';
 
 @Module({
   imports: [
@@ -33,14 +33,14 @@ import { AuditExecutionModule } from './audit/audit-execution/audit-execution.mo
         migrations: [__dirname + '/**/migrations/*{.ts,.js}'],
         autoLoadEntities: true,
         synchronize: true, // TODO: Disabled for production
-        logging: true,
+        logging: false,
         namingStrategy: new SnakeNamingStrategy(),
       }),
       inject: [ConfigService],
     }),
     TerminusModule,
     HttpModule,
-    AuditExecutionModule,
+    AuditModule,
   ],
   controllers: [HealthController],
 })

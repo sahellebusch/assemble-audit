@@ -5,14 +5,17 @@ export class LineItem<T = any> {
   public readonly text: string;
   public readonly type: LineItemType;
   public response?: T;
+  public readonly auditId: string;
 
   constructor(options: {
+    auditUuid: string;
     id?: string;
     text: string;
     type: LineItemType;
     response?: T;
   }) {
     this.id = options.id ?? uuidv4();
+    this.auditId = options.auditUuid;
     this.text = options.text;
     this.type = options.type;
     this.response = options.response;

@@ -14,12 +14,14 @@ export class RecurrenceSchedulerService {
     private readonly chartReviewService: CreateChartReviewService,
   ) {}
 
-  async handleAuditCompletion(auditId: string): Promise<void> {
+  async scheduleNextAudit(auditUuid: string): Promise<void> {
+    console.log('scheduleNextAudit', auditUuid);
     const recurrence = await this.recurrenceRepo.findOne({
-      where: { auditId },
+      where: { auditId: auditUuid },
       relations: ['audit'],
     });
 
+    console.log(recurrence);
     if (!recurrence) {
       return;
     }

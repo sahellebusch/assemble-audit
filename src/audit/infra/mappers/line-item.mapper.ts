@@ -8,6 +8,7 @@ export class LineItemMapper {
       text: instance.prompt,
       type: instance.type,
       response: instance.response as T,
+      auditUuid: instance.auditUuid,
     });
   }
 
@@ -17,6 +18,7 @@ export class LineItemMapper {
     instance.prompt = domain.text;
     instance.type = domain.type;
     instance.response = domain.response as any; // Cast to any for storage
+    instance.auditUuid = domain.auditId;
     return instance;
   }
 }

@@ -4,16 +4,21 @@ import { LineItemMapper } from './line-item.mapper';
 
 export class ChartReviewMapper {
   static toDomain(instance: AuditInstance): ChartReviewAudit {
-    return new ChartReviewAudit(
+    const audit = new ChartReviewAudit(
       instance.uuid,
       instance.assignedTo,
       instance.dueDate,
       instance.status,
-      instance.lineItems.map(LineItemMapper.toDomain),
       instance.ehrProvider,
       instance.patientId,
       instance.ehrData,
     );
+
+    audit.setLineItems(
+      instance.lineItems.map((item) => LineItemMapper.toDomain(item)),
+    );
+
+    return audit;
   }
 
   static toInstance(domain: ChartReviewAudit): AuditInstance {

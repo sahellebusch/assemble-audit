@@ -53,10 +53,18 @@ export class CreateChartReviewService {
       dto.dueDate,
       dto.ehrProvider,
       dto.patientId,
-      lineItems.map(
-        (item) => new LineItem({ text: item.text, type: item.type }),
-      ),
     );
+
+    const lineItemInstances = lineItems.map(
+      (item) =>
+        new LineItem({
+          auditUuid: audit.uuid,
+          text: item.text,
+          type: item.type,
+        }),
+    );
+
+    audit.setLineItems(lineItemInstances);
 
     return this.chartReviewRepository.save(audit);
   }

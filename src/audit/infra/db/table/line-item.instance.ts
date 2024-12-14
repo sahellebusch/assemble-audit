@@ -29,13 +29,11 @@ export class LineItemInstance {
   @Column({ nullable: true })
   answeredAt: Date | null;
 
-  @ManyToOne(() => AuditInstance, (audit) => audit.lineItems, {
-    onDelete: 'CASCADE',
-  })
+  @ManyToOne(() => AuditInstance, (audit) => audit.lineItems)
   audit: AuditInstance;
 
-  @Column()
-  auditId: string;
+  @Column({ type: 'uuid' })
+  auditUuid: string;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
