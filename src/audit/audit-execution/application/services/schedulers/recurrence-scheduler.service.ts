@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { RecurrencePatternInstance } from '../../../infra/db/table/recurrence-pattern.entity';
 import { AuditCreateService } from '../audit-create.service';
-import { RecurrencePattern } from 'src/audit/audit-execution/domain/entities/recurrence-pattern.entity';
+import { RecurrencePattern } from '../../../domain/entities/recurrence-pattern.entity';
 
 @Injectable()
 export class RecurrenceSchedulerService {

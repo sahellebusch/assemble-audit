@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AuditBase } from '../../domain/entities/audit-base.entity';
 import { AuditInstance } from '../db/table/audit.instance';
-import { LineItemInstance } from '../db/table/line-item.instance';
 import { AuditMapper } from '../mappers/audit.mapper';
 
 @Injectable()
@@ -11,8 +10,6 @@ export class AuditRepository {
   constructor(
     @InjectRepository(AuditInstance)
     private readonly auditRepository: Repository<AuditInstance>,
-    @InjectRepository(LineItemInstance)
-    private readonly lineItemRepository: Repository<LineItemInstance>,
     private readonly auditMapper: AuditMapper,
   ) {}
 
