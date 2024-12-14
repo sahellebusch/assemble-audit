@@ -7,7 +7,34 @@ import {
   IsOptional,
   IsString,
   IsUUID,
+  IsNumber,
+  ValidateNested,
 } from 'class-validator';
+import { Type } from 'class-transformer';
+import { RecurrenceFrequency } from '../../domain/types/recurrence-frequency.enum';
+
+export class RecurrenceDto {
+  @IsEnum(RecurrenceFrequency)
+  @ApiProperty({
+    enum: RecurrenceFrequency,
+    description: 'Frequency of recurrence',
+  })
+  frequency: RecurrenceFrequency;
+
+  @IsNumber()
+  @ApiProperty({
+    description: 'Interval of recurrence (e.g., every 2 weeks)',
+    minimum: 1,
+  })
+  interval: number;
+
+  @IsOptional()
+  @IsDateString()
+  @ApiPropertyOptional({
+    description: 'Optional end date for recurrence',
+  })
+  endDate?: Date;
+}
 
 export class CreateAuditDto {
   @IsNotEmpty()
@@ -46,6 +73,15 @@ export class CreateAuditDto {
     required: false,
   })
   public readonly patientId?: string;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => RecurrenceDto)
+  @ApiPropertyOptional({
+    type: RecurrenceDto,
+    description: 'Recurrence pattern for the audit',
+  })
+  recurrence?: RecurrenceDto;
 
   constructor(
     assignedTo: string,

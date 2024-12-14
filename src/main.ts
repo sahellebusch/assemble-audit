@@ -28,6 +28,7 @@ async function bootstrap() {
 
   app.enableVersioning({
     type: VersioningType.URI,
+    prefix: 'api/',
   });
 
   const document = SwaggerModule.createDocument(app, config);

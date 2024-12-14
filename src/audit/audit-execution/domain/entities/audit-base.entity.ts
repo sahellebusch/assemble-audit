@@ -16,8 +16,8 @@ export abstract class AuditBase {
   public readonly uuid: string;
   public readonly assignedTo: string;
   public readonly dueDate: Date;
-  public readonly lineItems: LineItem[];
-  public readonly status: AuditStatus;
+  private lineItems: LineItem[];
+  private status: AuditStatus;
   public readonly createdAt: Date;
   public readonly updatedAt: Date;
 
@@ -37,5 +37,35 @@ export abstract class AuditBase {
 
   isComplete(): boolean {
     return this.lineItems.every((item) => item.isAnswered());
+  }
+
+  getStatus(): AuditStatus {
+    return this.status;
+  }
+
+  getLineItems(): LineItem[] {
+    return this.lineItems;
+  }
+
+  setStatus(status: AuditStatus): void {
+    this.status = status;
+  }
+
+  updateLineItems(lineItems: LineItem[]): void {
+    if (this.isComplete()) {
+      throw new Error('Cannot update completed audit');
+    }
+
+    const lineItemMap = new Map(this.lineItems.map((item) => [item.id, item]));
+
+    for (const lineItem of lineItems) {
+      if (lineItemMap.has(lineItem.id)) {
+        lineItemMap.get(lineItem.id)!.updateResponse(lineItem.response);
+      } else {
+        lineItemMap.set(lineItem.id, lineItem);
+      }
+    }
+
+    this.lineItems = Array.from(lineItemMap.values());
   }
 }

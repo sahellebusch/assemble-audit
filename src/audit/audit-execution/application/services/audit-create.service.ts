@@ -6,13 +6,19 @@ import { EHRService } from '../../../../ehr/application/services/ehr.service';
 import { AuditRepository } from '../../infra/repositories/audit.repository';
 import { AUDIT_LINE_ITEMS } from '../../domain/config/audit-line-items.config';
 import { LineItem } from '../../domain/entities/line-item.entity';
-import { CreateAuditDto } from '../dtos/create-audit.dto';
+import { CreateAuditDto, RecurrenceDto } from '../dtos/create-audit.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { RecurrencePatternInstance } from '../../infra/db/table/recurrence-pattern.entity';
+import { Repository } from 'typeorm';
+import { RecurrencePattern } from '../../domain/entities/recurrence-pattern.entity';
 
 @Injectable()
 export class AuditCreateService {
   constructor(
     private readonly ehrService: EHRService,
     private readonly auditRepository: AuditRepository,
+    @InjectRepository(RecurrencePatternInstance)
+    private readonly recurrenceRepo: Repository<RecurrencePatternInstance>,
   ) {}
 
   async createAudit(command: CreateAuditDto): Promise<string> {
@@ -37,7 +43,8 @@ export class AuditCreateService {
 
       const audit = new DocumentationAudit({
         assignedTo: command.assignedTo,
-        dueDate: new Date(command.dueDate),
+        dueDate:
+          command.dueDate ?? this.calculateInitialDueDate(command.recurrence),
         lineItems,
         status: AuditStatus.Pending,
         patient,
@@ -45,10 +52,40 @@ export class AuditCreateService {
         providerId: command.providerId,
       });
 
-      await this.auditRepository.save(audit);
-      return audit.uuid;
+      const savedAudit = await this.auditRepository.save(audit);
+
+      if (command.recurrence) {
+        const pattern = new RecurrencePattern(
+          command.recurrence.frequency,
+          command.recurrence.interval,
+          command.recurrence.endDate,
+        );
+
+        const recurrence = new RecurrencePatternInstance();
+        recurrence.frequency = pattern.frequency;
+        recurrence.interval = pattern.interval;
+        recurrence.endDate = pattern.endDate;
+        recurrence.nextExecutionDate = pattern.calculateNextDate(audit.dueDate);
+        recurrence.auditId = savedAudit.uuid;
+        await this.recurrenceRepo.save(recurrence);
+      }
+
+      return savedAudit.uuid;
     }
 
     throw new Error(`Audit type ${command.auditType} not implemented yet`);
+  }
+
+  private calculateInitialDueDate(recurrence?: RecurrenceDto): Date {
+    if (!recurrence) {
+      throw new Error('Due date is required when recurrence is not specified');
+    }
+
+    const pattern = new RecurrencePattern(
+      recurrence.frequency,
+      recurrence.interval,
+      recurrence.endDate,
+    );
+    return pattern.calculateNextDate(new Date());
   }
 }
