@@ -3,14 +3,17 @@ import { AppModule } from './app.module';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { GlobalExceptionFilter } from './interceptors/global-exception.filter';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as yaml from 'yaml';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService);
 
-  // Enable CORS
   app.enableCors();
 
-  // Global pipes
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -19,7 +22,6 @@ async function bootstrap() {
     }),
   );
 
-  // Swagger documentation setup
   const config = new DocumentBuilder()
     .setTitle('API Documentation')
     .setDescription('API description')
@@ -34,11 +36,15 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  // Get port from environment variables with fallback
-  const port = process.env.PORT || 3000;
+  if (configService.get<string>('APP_ENV') === 'local') {
+    const yamlString = yaml.stringify(document);
+    const filePath = path.resolve(process.cwd(), 'swagger.yaml');
+    fs.writeFileSync(filePath, yamlString, 'utf8');
+  }
 
   app.useGlobalFilters(new GlobalExceptionFilter());
 
+  const port = configService.get<number>('PORT') || 3000;
   await app.listen(port);
   console.log(`Application is running on: http://localhost:${port}`);
 }

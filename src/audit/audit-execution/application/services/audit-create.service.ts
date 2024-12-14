@@ -23,16 +23,16 @@ export class AuditCreateService {
 
   async createAudit(command: CreateAuditDto): Promise<string> {
     if (command.auditType === AuditType.ChartReview) {
-      if (!command.providerId || !command.patientId) {
+      if (!command.ehrProvider || !command.patientId) {
         throw new Error(
           'Provider ID and Patient ID are required for documentation audits',
         );
       }
 
       const [patient, conditions] = await Promise.all([
-        this.ehrService.getPatient(command.providerId, command.patientId),
+        this.ehrService.getPatient(command.ehrProvider, command.patientId),
         this.ehrService.getPatientConditions(
-          command.providerId,
+          command.ehrProvider,
           command.patientId,
         ),
       ]);
@@ -49,7 +49,7 @@ export class AuditCreateService {
         status: AuditStatus.Pending,
         patient,
         conditions,
-        providerId: command.providerId,
+        providerId: command.ehrProvider,
       });
 
       const savedAudit = await this.auditRepository.save(audit);

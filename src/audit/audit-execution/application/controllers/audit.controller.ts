@@ -7,7 +7,15 @@ import {
   Post,
   Patch,
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiTags,
+  ApiParam,
+  ApiNotFoundResponse,
+  ApiCreatedResponse,
+  ApiBadRequestResponse,
+  ApiOkResponse,
+} from '@nestjs/swagger';
 import { AuditCreateService } from '../services/audit-create.service';
 import { CreateAuditDto } from '../dtos/create-audit.dto';
 import { AuditResponseDto } from '../dtos/audit-response.dto';
@@ -26,10 +34,17 @@ export class AuditV1Controller {
   ) {}
 
   @Post()
-  @ApiResponse({
-    status: 201,
-    description: 'Audit created and assigned successfully',
-    type: String,
+  @ApiOperation({
+    summary: 'Create a new audit',
+    description:
+      'Creates a new audit with the specified configuration and line items',
+  })
+  @ApiCreatedResponse({
+    description: 'The audit has been successfully created',
+    type: AuditResponseDto,
+  })
+  @ApiBadRequestResponse({
+    description: 'Invalid input data provided',
   })
   async createAudit(
     @Body() createAuditDto: CreateAuditDto,
@@ -39,8 +54,24 @@ export class AuditV1Controller {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get an audit by ID' })
-  @ApiResponse({ status: 200, type: AuditResponseDto })
+  @ApiOperation({
+    summary: 'Get an audit by ID',
+    description:
+      'Retrieves the full audit details including all line items and responses',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'The unique identifier of the audit',
+    required: true,
+    type: String,
+  })
+  @ApiOkResponse({
+    description: 'The audit has been successfully retrieved',
+    type: AuditResponseDto,
+  })
+  @ApiNotFoundResponse({
+    description: 'Audit not found',
+  })
   async getAudit(@Param('id') id: string): Promise<AuditResponseDto> {
     try {
       const audit = await this.getService.execute(id);
@@ -54,11 +85,26 @@ export class AuditV1Controller {
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Update audit status and/or line item responses' })
-  @ApiResponse({
-    status: 200,
-    description: 'Audit updated successfully',
+  @ApiOperation({
+    summary: 'Update audit status and responses',
+    description:
+      'Updates an existing audit with new status and/or line item responses',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'The unique identifier of the audit to update',
+    required: true,
+    type: String,
+  })
+  @ApiOkResponse({
+    description: 'The audit has been successfully updated',
     type: AuditResponseDto,
+  })
+  @ApiBadRequestResponse({
+    description: 'Invalid update data provided',
+  })
+  @ApiNotFoundResponse({
+    description: 'Audit not found',
   })
   async updateAudit(
     @Param('id') id: string,

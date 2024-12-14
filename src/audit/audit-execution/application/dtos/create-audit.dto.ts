@@ -15,11 +15,12 @@ import { RecurrenceFrequency } from '../../domain/types/recurrence-frequency.enu
 
 export class RecurrenceDto {
   @IsEnum(RecurrenceFrequency)
-  @ApiProperty({
+  @IsOptional()
+  @ApiPropertyOptional({
     enum: RecurrenceFrequency,
-    description: 'Frequency of recurrence',
+    description: 'Frequency of recurrence. Optional if audit is not recurring.',
   })
-  frequency: RecurrenceFrequency;
+  frequency?: RecurrenceFrequency;
 
   @IsNumber()
   @ApiProperty({
@@ -64,7 +65,7 @@ export class CreateAuditDto {
     description: 'ID of the provider associated with the audit',
     required: false,
   })
-  public readonly providerId?: string;
+  public readonly ehrProvider?: string;
 
   @IsOptional()
   @IsUUID()
@@ -93,7 +94,7 @@ export class CreateAuditDto {
     this.assignedTo = assignedTo;
     this.auditType = auditType;
     this.dueDate = dueDate;
-    this.providerId = providerId;
+    this.ehrProvider = providerId;
     this.patientId = patientId;
   }
 }

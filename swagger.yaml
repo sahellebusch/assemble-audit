@@ -1,0 +1,317 @@
+openapi: 3.0.0
+paths:
+  /health:
+    get:
+      operationId: HealthController_check
+      parameters: []
+      responses:
+        '200':
+          description: The Health Check is successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  info:
+                    type: object
+                    example: &a1
+                      database: &a2
+                        status: up
+                    additionalProperties:
+                      type: object
+                      required:
+                        - status
+                      properties:
+                        status:
+                          type: string
+                      additionalProperties: true
+                    nullable: true
+                  error:
+                    type: object
+                    example: {}
+                    additionalProperties:
+                      type: object
+                      required:
+                        - status
+                      properties:
+                        status:
+                          type: string
+                      additionalProperties: true
+                    nullable: true
+                  details:
+                    type: object
+                    example: *a1
+                    additionalProperties:
+                      type: object
+                      required:
+                        - status
+                      properties:
+                        status:
+                          type: string
+                      additionalProperties: true
+        '503':
+          description: The Health Check is not successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  info:
+                    type: object
+                    example: *a1
+                    additionalProperties:
+                      type: object
+                      required:
+                        - status
+                      properties:
+                        status:
+                          type: string
+                      additionalProperties: true
+                    nullable: true
+                  error:
+                    type: object
+                    example:
+                      redis: &a3
+                        status: down
+                        message: Could not connect
+                    additionalProperties:
+                      type: object
+                      required:
+                        - status
+                      properties:
+                        status:
+                          type: string
+                      additionalProperties: true
+                    nullable: true
+                  details:
+                    type: object
+                    example:
+                      database: *a2
+                      redis: *a3
+                    additionalProperties:
+                      type: object
+                      required:
+                        - status
+                      properties:
+                        status:
+                          type: string
+                      additionalProperties: true
+      tags:
+        - health-check
+  /api/1/audits:
+    post:
+      operationId: AuditV1Controller_createAudit_api/1
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAuditDto'
+      responses:
+        '201':
+          description: Audit created and assigned successfully
+          content:
+            application/json:
+              schema:
+                type: string
+      tags: &a4
+        - Audits
+  /api/1/audits/{id}:
+    get:
+      operationId: AuditV1Controller_getAudit_api/1
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditResponseDto'
+      summary: Get an audit by ID
+      tags: *a4
+    patch:
+      operationId: AuditV1Controller_updateAudit_api/1
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAuditDto'
+      responses:
+        '200':
+          description: Audit updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditResponseDto'
+      summary: Update audit status and/or line item responses
+      tags: *a4
+info:
+  title: API Documentation
+  description: API description
+  version: '1.0'
+  contact: {}
+tags: []
+servers: []
+components:
+  schemas:
+    RecurrenceDto:
+      type: object
+      properties:
+        frequency:
+          type: string
+          enum:
+            - DAILY
+            - WEEKLY
+            - MONTHLY
+            - QUARTERLY
+            - YEARLY
+          description: Frequency of recurrence
+        interval:
+          type: number
+          description: Interval of recurrence (e.g., every 2 weeks)
+          minimum: 1
+        endDate:
+          format: date-time
+          type: string
+          description: Optional end date for recurrence
+      required:
+        - frequency
+        - interval
+    CreateAuditDto:
+      type: object
+      properties:
+        assignedTo:
+          type: string
+          description: User ID the audit is assigned to
+        auditType:
+          type: string
+          enum:
+            - chart-review
+            - practice-audit
+            - safety-audit
+          description: Type of audit to be created
+        dueDate:
+          format: date-time
+          type: string
+          description: Due date for the audit
+        providerId:
+          type: string
+          description: ID of the provider associated with the audit
+        patientId:
+          type: string
+          description: ID of the patient associated with the audit
+        recurrence:
+          description: Recurrence pattern for the audit
+          allOf:
+            - $ref: '#/components/schemas/RecurrenceDto'
+      required:
+        - assignedTo
+        - auditType
+        - dueDate
+    LineItemResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+        prompt:
+          type: string
+        type:
+          type: string
+          enum:
+            - boolean
+            - text
+            - number
+            - multi_choice
+        response:
+          type: boolean
+          nullable: true
+        comment:
+          type: string
+          nullable: true
+        answeredAt:
+          format: date-time
+          type: string
+          nullable: true
+      required:
+        - id
+        - prompt
+        - type
+        - response
+        - comment
+        - answeredAt
+    AuditResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+        assignedTo:
+          type: string
+        dueDate:
+          format: date-time
+          type: string
+        status:
+          type: string
+          enum:
+            - pending
+            - in-progress
+            - completed
+        lineItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/LineItemResponseDto'
+        createdAt:
+          format: date-time
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+      required:
+        - id
+        - assignedTo
+        - dueDate
+        - status
+        - lineItems
+        - createdAt
+        - updatedAt
+    UpdateLineItemDto:
+      type: object
+      properties:
+        id:
+          type: string
+        response:
+          type: string
+      required:
+        - id
+        - response
+    UpdateAuditDto:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - pending
+            - in-progress
+            - completed
+        lineItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/UpdateLineItemDto'
