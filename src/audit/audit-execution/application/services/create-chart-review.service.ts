@@ -18,7 +18,13 @@ export class CreateChartReviewService {
       dto.dueDate,
       dto.ehrProvider,
       dto.patientId,
-      lineItems.map((item) => new LineItem(item.id, item.text, item.type)),
+      lineItems.map(
+        (item) =>
+          new LineItem({
+            text: item.text,
+            type: item.type,
+          }),
+      ),
     );
 
     return this.chartReviewRepository.save(audit);

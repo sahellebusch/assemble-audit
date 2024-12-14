@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { RecurrencePatternInstance } from '../../../infra/db/table/recurrence-pattern.entity';
-import { RecurrencePattern } from '../../../domain/entities/recurrence-pattern.entity';
-import { CreateChartReviewService } from '../create-chart-review.service';
-import { AuditType } from '../../../domain/types/audit-types.enum';
+import { RecurrencePatternInstance } from '../../infra/db/table/recurrence-pattern.entity';
+import { RecurrencePattern } from '../../domain/entities/recurrence-pattern.entity';
+import { CreateChartReviewService } from './create-chart-review.service';
+import { AuditType } from '../../domain/types/audit-types.enum';
 
 @Injectable()
 export class RecurrenceSchedulerService {
