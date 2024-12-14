@@ -202,7 +202,7 @@ The Lambda Monolith will be designed with a future-oriented, incremental scalabi
 
 # High Level Architecture
 
-![](./high-level-architecture.excalidraw.svg)
+![](./excalidraw/high-level-architecture.excalidraw.svg)
 
 # Core Domain: Auditing
 
