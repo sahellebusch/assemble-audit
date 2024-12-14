@@ -2,16 +2,14 @@
 
 ## Decision Framework
 
-To make an informed decision on the architecture for the Standard Work Audits module, the following criteria will guide us:
+To make an informed decision on the architecture for the Standard Work Audits module, the following criteria was used to frame the decision:
 
 1. **Development Speed**: How quickly the solution can be implemented.
-2. **Scalability**: The ability to handle increased workload as the startup grows.
+2. **Scalability**: Both from a technical (maintaining and scaling) and cost perspective.
 3. **Cost Efficiency**: Minimizing upfront and operational costs.
 4. **Ease of Maintenance**: Simplicity in managing and iterating on the system.
 5. **Integration Potential**: How easily the architecture integrates with external systems (e.g., hospital EHR systems).
-6. **Team Expertise**: Alignment with the current skillset and capacity of the development team.
-
----
+6. **Team Expertise**: Alignment with the current skillset and capacity of the development team (me?!).
 
 ## Architecture Options
 
@@ -35,12 +33,6 @@ A highly scalable system where each feature (e.g., task management, audit CRUD, 
 - **Cost**: Higher initial and operational costs.
 - **Team Expertise**: Demands proficiency in distributed systems and DevOps.
 
-#### Best For:
-
-Startups with plans for long-term scalability and engineering resources to handle complexity.
-
----
-
 ### **Option 2: Serverless Architecture**
 
 #### Overview
@@ -62,12 +54,6 @@ Leverages cloud-native serverless services (e.g., AWS Lambda) for modular compon
 - **Vendor Lock-in**: Tied to a specific cloud provider's ecosystem.
 - **Complexity at Scale**: Managing many serverless functions can become challenging over time.
 
-#### Best For:
-
-Startups with limited budgets and the need for rapid prototyping or launching an MVP.
-
----
-
 ### **Option 3: Monolithic Application**
 
 #### Overview
@@ -87,38 +73,7 @@ A single application handles all functionality, including task management, audit
 - **Integration**: Tight coupling makes integration with external systems harder.
 - **Technical Debt**: Changes to one part of the application can disrupt others.
 
-#### Best For:
-
-Startups in early stages prioritizing speed and cost-efficiency over long-term scalability.
-
----
-
-### **Option 4: Hybrid Architecture**
-
-#### Overview
-
-Combines microservices for critical components with a monolithic core for simpler functions.
-
-#### Pros:
-
-- **Balanced Flexibility**: Combines the best of monolithic and microservices architectures.
-- **Cost Efficiency**: Keeps simpler functions in a monolith to reduce costs.
-- **Development Speed**: Faster than fully microservices, while enabling scalability for key components.
-- **Scalability**: Supports growth without over-engineering initially.
-
-#### Cons:
-
-- **Complexity**: Requires management of both monolith and microservices components.
-- **Integration**: Additional integration layers can add complexity.
-- **Team Expertise**: Requires knowledge in both monolith and distributed systems.
-
-#### Best For:
-
-Startups with moderate technical capacity needing scalability and incremental delivery.
-
----
-
-### **Option 5: Lambda Monolith**
+### **Option 4: Lambda Monolith**
 
 #### Overview
 
@@ -139,12 +94,6 @@ A single monolithic application deployed inside a serverless runtime (e.g., AWS 
 - **Execution Limits**: Constrained by Lambda’s runtime and memory limits.
 - **Vendor Lock-in**: Dependent on the serverless platform’s ecosystem.
 
-#### Best For:
-
-Startups looking for a cost-efficient, scalable solution without the complexity of full microservices.
-
----
-
 ## Decision
 
 Based on the outlined criteria and trade-offs, the **Lambda Monolith** architecture is the most suitable choice for the current needs of the startup. It balances the following:
@@ -154,35 +103,9 @@ Based on the outlined criteria and trade-offs, the **Lambda Monolith** architect
 - **Cost-efficiency** by leveraging serverless pay-as-you-go pricing.
 - **Simplicity** in management and debugging for a small team.
 
-This approach allows the startup to focus on delivering value while ensuring scalability and operational efficiency as the business grows.
+### Rationale for Lambda Monolith
 
----
-
-## Implementation Plan: Lambda Monolith
-
-### **Incremental Scalability Strategy**
-
-The Lambda Monolith will be designed with a future-oriented, incremental scalability approach:
-
-1. **Start as a Monolith in Lambda**:
-
-   - Implement all business logic as a cohesive unit to simplify development and deployment.
-   - Deploy the application in AWS Lambda to leverage serverless scalability.
-
-2. **Monitor Traffic and Performance**:
-
-   - Continuously monitor usage patterns and bottlenecks using AWS CloudWatch.
-   - Scale Lambda resources dynamically to handle traffic spikes.
-
-3. **Transition to a Running Service**:
-
-   - As traffic grows, migrate the monolith to a long-running containerized service (e.g., AWS ECS/Fargate or Kubernetes).
-   - Enable persistent connections and lower latency for high-throughput demands.
-
-4. **Break into Microservices as Needed**:
-
-   - Identify domain boundaries and split components (e.g., audit CRUD, notifications) into independent microservices when necessary.
-   - Use APIs or messaging queues (e.g., Amazon SQS) to enable communication between services.
+The lambda monolith is designed to ensure a seamless transition from initial development to a more scalable architecture as the system grows. Initially, all business logic will be implemented as a cohesive unit within AWS Lambda, leveraging its serverless scalability to simplify development and deployment. Usage patterns and performance will be continuously monitored using AWS CloudWatch, allowing for dynamic scaling of Lambda resources to handle traffic spikes effectively. As traffic increases, the monolith can be migrated to a long-running containerized service, such as AWS ECS/Fargate or Kubernetes, to support persistent connections and reduce latency for high-throughput demands. Over time, domain boundaries will be identified, enabling the system to evolve by splitting key components, like audit CRUD and notifications, into independent microservices. These microservices will communicate via APIs or messaging queues, such as Amazon SQS, ensuring the architecture remains flexible and scalable as business needs expand.
 
 ## Technology Choices and Rationale
 
@@ -194,10 +117,10 @@ The Lambda Monolith will be designed with a future-oriented, incremental scalabi
 
 ### **Aurora Serverless with PostgreSQL**
 
-- **Relational Strengths**: PostgreSQL offers a robust relational database system with strong support for complex queries, transactions, and constraints, ensuring data integrity.
+- **Relational Strengths**: PostgreSQL is a fantastic relational database with a strong ecosystem, and Aurora Serverless is a great way to run it in a serverless environment. Based on the provided data model, a relational database is the better choice due to its structured nature, strong relationships, and predictable query patterns. If we needed to scale to ridiculous amounts of data, a nosql database would be a better choice. I don't anticipate we need that at this time.
 - **Scalability**: Aurora Serverless auto-scales the database capacity based on demand, reducing the overhead of managing database resources.
-- **Integration with AWS**: Aurora Serverless integrates seamlessly with AWS Lambda and other AWS services, optimizing serverless workflows.
-- **Cost Efficiency**: Operates on a pay-as-you-go model, minimizing costs during low activity while accommodating growth seamlessly.
+- **Integration with AWS**: Aurora Serverless integrates easily with AWS Lambda and other AWS services.
+- **Cost Efficiency**: Operates on a pay-as-you-go model, minimizing costs during low activity.
 - **Flexibility for Future Requirements**: PostgreSQL’s JSONB support enables semi-structured data storage, allowing adaptability for evolving audit requirements.
 
 # High Level Architecture
@@ -216,6 +139,8 @@ The **Audit** domain serves as the central concept for all audit-related workflo
 - Provide insights and reports for audits.
 
 ### Ubiquitous Language
+
+_Note: A PM should help define the ubiquitous language for the domain. I'm taking liberties here 😄_
 
 - **Audit**: A structured evaluation process that assesses compliance with defined standards or procedures. It is the central entity in the auditing process, containing associated **Line Items** and managed by a **Recurrence Schedule** when applicable.
 - **Recurrence Schedule**: A plan defining how and when an **Audit** is repeated over time. It specifies the frequency (e.g., weekly, monthly), interval (e.g., every 2 weeks), and optional end date for automated scheduling of recurring audits.
@@ -273,16 +198,13 @@ erDiagram
 
     audits ||--o{ audit_recurrences : "Has one or zero recurrence"
     audits ||--o{ line_items : "Has multiple line items"
-
 ```
 
 ## Directory Structure
 
 The design follows a directory structure that mirrors the core domain and subdomains, ensuring clear organization and separation of concerns.
 
-### Example Tree Structure
-
-Below is an example of an actual implementation of the directory structure based on current progress:
+_Note: This isn't typical for a design doc, but I wanted to highlight in this case to show the hexagonal architecture._
 
 ```
 src
@@ -322,14 +244,6 @@ src
 └── interceptors
 ```
 
-This structure highlights:
-
-- The modular organization of the `audit` domain into subdomains like `audit-execution`.
-- Clear separation of `application`, `domain`, and `infra` layers consistent with Hexagonal Architecture principles.
-- Progress toward a complete implementation, with room for additional subdomains like `audit-configuration` and `audit-reporting`.
-
----
-
 ## Hexagonal Architecture Design
 
 To implement Hexagonal (Ports and Adapters) Architecture, the design ensures clear separation between the core domain logic and external systems ([an excellent reference](https://github.com/Sairyss/domain-driven-hexagon)).
@@ -338,11 +252,11 @@ To implement Hexagonal (Ports and Adapters) Architecture, the design ensures cle
 
 #### Domain Layer
 
-This layer houses the core _business_ logic, entities, and services. It is completely independent of frameworks, databases, or external systems.
+This layer houses the core _business_ logic, entities, and services. It is completely independent of frameworks, databases, or external systems. This is where the magic happens.
 
 **Key Components:**
 
-- **Entities:** Represent core concepts like `Audit`, and `LineItem`, or `Patient` (not a FHIR patient, but an abstraction).
+- **Entities:** Represent core concepts like `Audit`, and `LineItem`, or `Patient` (not a FHIR patient, but an internal abstraction).
 - **Domain Services:** Implement business logic, such as compliance validation and audit creation.
 
 #### Application Layer
@@ -356,34 +270,14 @@ This layer coordinates the application's use cases and serves as an intermediary
 
 #### Ports and Adapters
 
-This layer handles interaction with external systems (e.g., databases, APIs, UI) via well-defined interfaces (ports). Adapters implement these interfaces.
+This layer handles interaction with external systems (e.g., databases, APIs) via well-defined interfaces (ports). Adapters implement these interfaces.
 
 **Key Components:**
 
 - **Ports:** Define interfaces for external interactions, such as `AuditRepository` and `NotificationService`.
 - **Adapters:** Provide implementations for these interfaces, such as a database adapter for storing audits.
 
-```mermaid
-graph TD
-    A[Application Layer] -->|depends on| B[Domain Layer]
-    C[Infrastructure Layer] -->|implements abstractions| B
-
-    subgraph A[Application Layer]
-        AS[Application Service]
-        API[API]
-    end
-
-    subgraph B[Domain Layer]
-        Model1[Model]
-        Model2[Model]
-    end
-
-    subgraph C[Infrastructure Layer]
-        Cache[Cache]
-        Service[Service]
-        Repositories[Repositories]
-    end
-```
+![](./excalidraw//ddd-layers.excalidraw.svg)
 
 ## EHR Integration Strategy
 
@@ -482,7 +376,7 @@ export class EHRService {
 
 ## Workflow for Recurrence Management
 
-Recurrence functionality is integral to automating the audit lifecycle. The following sequence diagram illustrates how recurrence is triggered upon audit completion:
+Recurrence functionality is integral to automating the audit lifecycle. The following sequence diagram illustrates how recurrence is triggered upon audit completion. This is the simplest implementation of recurrence.
 
 ```mermaid
 sequenceDiagram
@@ -505,9 +399,7 @@ sequenceDiagram
     AuditController->>User: AuditResponseDto
 ```
 
----
-
-## Evolutions for Recurrence Implementation
+## Evolutions / Alternatives for Recurrence Implementation
 
 ### **1. Event-Driven Design**
 
