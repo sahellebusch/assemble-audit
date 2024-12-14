@@ -55,14 +55,6 @@ db-connect:
 	$(INFO) "Connecting to database..."
 	@$(DOCKER_COMPOSE) exec $(DB_CONTAINER) psql -U username -d audit
 
-db-create:
-	$(INFO) "Creating database..."
-	@$(DOCKER_COMPOSE) exec $(DB_CONTAINER) createdb -U username audit
-
-db-drop:
-	$(INFO) "Dropping database..."
-	@$(DOCKER_COMPOSE) exec $(DB_CONTAINER) dropdb -U username audit
-
 # Migration commands
 .PHONY: migration-gen migration-run migration-revert
 migration-gen:
