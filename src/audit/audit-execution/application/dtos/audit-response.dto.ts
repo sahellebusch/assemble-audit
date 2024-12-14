@@ -40,34 +40,12 @@ export class AuditResponseDto {
   @ApiProperty({ enum: AuditStatus })
   status: AuditStatus;
 
-  @ApiProperty({ type: [LineItemResponseDto] })
-  lineItems: LineItemResponseDto[];
-
-  @ApiProperty()
-  createdAt: Date;
-
-  @ApiProperty()
-  updatedAt: Date;
-
   static from(audit: AuditBase): AuditResponseDto {
     return {
-      id: audit.uuid,
+      id: audit.id,
       assignedTo: audit.assignedTo,
       dueDate: audit.dueDate,
       status: audit.getStatus(),
-      lineItems: audit.getLineItems().map(
-        (item) =>
-          new LineItemResponseDto({
-            id: item.id,
-            prompt: item.text,
-            type: item.type,
-            response: item.response as boolean,
-            comment: item.response?.comment ?? null,
-            answeredAt: item.response?.answeredAt ?? null,
-          }),
-      ),
-      createdAt: audit.createdAt,
-      updatedAt: audit.updatedAt,
     };
   }
 }

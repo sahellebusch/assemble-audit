@@ -20,6 +20,12 @@ export class AuditInstance {
   @Column({ type: 'enum', enum: AuditStatus })
   status: AuditStatus;
 
+  @Column({ nullable: true })
+  ehrProvider?: string;
+
+  @Column({ nullable: true })
+  patientId?: string;
+
   @OneToMany(() => LineItemInstance, (lineItem) => lineItem.audit, {
     cascade: true,
   })
