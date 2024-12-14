@@ -11,6 +11,9 @@ import { UpdateChartReviewService } from './application/services/update-chart-re
 import { GetAuditsService } from './application/services/get-audits.service';
 import { AuditV1Controller } from './application/controllers/audit.controller';
 
+import { MockUnitAdapter } from './infra/adapters/mock-unit.adapter';
+import { UNIT_PORT } from './domain/ports/unit.port';
+
 @Module({
   imports: [
     TypeOrmModule.forFeature([AuditInstance, LineItemInstance]),
@@ -23,6 +26,10 @@ import { AuditV1Controller } from './application/controllers/audit.controller';
     GetChartReviewService,
     UpdateChartReviewService,
     GetAuditsService,
+    {
+      provide: UNIT_PORT,
+      useClass: MockUnitAdapter,
+    },
   ],
 })
 export class AuditExecutionModule {}

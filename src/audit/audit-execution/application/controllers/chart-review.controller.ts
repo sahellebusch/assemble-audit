@@ -24,7 +24,7 @@ import { UpdateChartReviewDto } from '../dtos/update-chart-review.dto';
 import { AuditNotFoundError } from '../../domain/errors/audit-not-found.error';
 
 @ApiTags('Chart Review')
-@Controller({ path: 'audits/chart-review', version: '1' })
+@Controller({ path: 'audits/chart-reviewsd', version: '1' })
 export class ChartReviewController {
   constructor(
     private readonly createService: CreateChartReviewService,
@@ -34,12 +34,12 @@ export class ChartReviewController {
 
   @Post()
   @ApiOperation({
-    summary: 'Create a new chart review audit',
+    summary: 'Create a new chart reviews',
     description:
       'Creates a new chart review audit with EHR provider and patient information',
   })
   @ApiCreatedResponse({
-    description: 'Chart review audit created successfully',
+    description: 'Chart reviews created successfully',
     type: ChartReviewResponseDto,
   })
   @ApiBadRequestResponse({
@@ -47,9 +47,9 @@ export class ChartReviewController {
   })
   async createChartReview(
     @Body() createDto: CreateChartReviewAuditDto,
-  ): Promise<ChartReviewResponseDto> {
-    const audit = await this.createService.execute(createDto);
-    return ChartReviewResponseDto.from(audit);
+  ): Promise<ChartReviewResponseDto[]> {
+    const audits = await this.createService.execute(createDto);
+    return audits.map(ChartReviewResponseDto.from);
   }
 
   @Get(':id')

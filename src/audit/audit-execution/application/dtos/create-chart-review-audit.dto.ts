@@ -6,25 +6,33 @@ import {
   IsString,
   IsUUID,
   ValidateNested,
+  ValidateIf,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { RecurrenceDto } from './create-audit.dto';
 
 export class CreateChartReviewAuditDto {
-  @IsNotEmpty()
+  @ValidateIf((o) => !o.unitId)
   @IsUUID()
-  @ApiProperty({
-    description: 'User ID the chart review is assigned to',
-    example: '123e4567-e89b-12d3-a456-426614174000',
+  @ApiPropertyOptional({
+    description:
+      'User ID the chart review is assigned to. Required if no unitId provided',
   })
-  public readonly assignedTo: string;
+  public readonly assignedTo?: string;
+
+  @ValidateIf((o) => !o.assignedTo)
+  @IsString()
+  @ApiPropertyOptional({
+    description:
+      'Unit ID to assign the chart review to. Required if no assignedTo provided',
+  })
+  public readonly unitId?: string;
 
   @IsNotEmpty()
   @IsDateString()
   @ApiProperty({
     description: 'Due date for the chart review',
     type: Date,
-    example: '2024-12-31T23:59:59Z',
   })
   public readonly dueDate: Date;
 
@@ -32,7 +40,6 @@ export class CreateChartReviewAuditDto {
   @IsString()
   @ApiProperty({
     description: 'ID of the EHR provider for the chart review',
-    example: 'EPIC_PROD_01',
   })
   public readonly ehrProvider: string;
 
@@ -40,7 +47,6 @@ export class CreateChartReviewAuditDto {
   @IsUUID()
   @ApiProperty({
     description: 'ID of the patient whose chart is being reviewed',
-    example: '123e4567-e89b-12d3-a456-426614174000',
   })
   public readonly patientId: string;
 
