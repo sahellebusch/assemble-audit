@@ -1,31 +1,33 @@
 import {
+  CreateDateColumn,
   Entity,
   PrimaryGeneratedColumn,
   Column,
   OneToOne,
   JoinColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { AuditInstance } from './audit.instance';
 import { RecurrenceFrequency } from '../../../domain/types/recurrence-frequency.enum';
 
-@Entity('recurrence_patterns')
+@Entity('audit_recurrences')
 export class RecurrencePatternInstance {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  uuid: string;
 
   @Column({
-    type: 'enum',
-    enum: RecurrenceFrequency,
+    type: 'varchar',
+    length: 20,
   })
   frequency: RecurrenceFrequency;
 
   @Column()
   interval: number;
 
-  @Column({ nullable: true, type: 'timestamp' })
-  endDate?: Date;
+  @Column({ nullable: true, type: 'date' })
+  endDate: Date | null;
 
-  @Column({ type: 'timestamp' })
+  @Column({ type: 'date' })
   nextExecutionDate: Date;
 
   @OneToOne(() => AuditInstance)
@@ -34,4 +36,10 @@ export class RecurrencePatternInstance {
 
   @Column()
   auditId: string;
+
+  @CreateDateColumn({ type: 'timestamp' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ type: 'timestamp' })
+  updatedAt: Date;
 }

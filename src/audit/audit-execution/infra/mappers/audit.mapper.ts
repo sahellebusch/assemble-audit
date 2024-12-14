@@ -5,7 +5,7 @@ import { LineItemMapper } from './line-item.mapper';
 export class AuditMapper {
   static toDomain(instance: AuditInstance): AuditBase {
     return new AuditBase(
-      instance.id,
+      instance.uuid,
       instance.assignedTo,
       instance.dueDate,
       instance.auditType,

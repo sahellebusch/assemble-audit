@@ -4,7 +4,7 @@ import { LineItem } from './line-item.entity';
 
 export class AuditBase {
   constructor(
-    public readonly id: string,
+    public readonly uuid: string,
     public readonly assignedTo: string,
     public readonly dueDate: Date,
     public readonly auditType: AuditType,

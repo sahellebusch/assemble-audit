@@ -21,7 +21,7 @@ export class AuditFindAllDto {
 
   static from(audit: AuditBase): AuditFindAllDto {
     const dto = new AuditFindAllDto();
-    dto.id = audit.id;
+    dto.id = audit.uuid;
     dto.assignedTo = audit.assignedTo;
     dto.dueDate = audit.dueDate;
     dto.auditType = audit.auditType;

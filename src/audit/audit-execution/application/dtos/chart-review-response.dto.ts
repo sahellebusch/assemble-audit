@@ -35,7 +35,7 @@ export class ChartReviewResponseDto {
 
   static from(audit: ChartReviewAudit): ChartReviewResponseDto {
     const dto = new ChartReviewResponseDto();
-    dto.id = audit.id;
+    dto.id = audit.uuid;
     dto.assignedTo = audit.assignedTo;
     dto.dueDate = audit.dueDate;
     dto.ehrProvider = audit.ehrProvider;

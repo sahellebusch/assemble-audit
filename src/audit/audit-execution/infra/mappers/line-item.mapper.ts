@@ -4,7 +4,7 @@ import { LineItemInstance } from '../db/table/line-item.instance';
 export class LineItemMapper {
   static toDomain<T>(instance: LineItemInstance): LineItem<T> {
     return new LineItem<T>({
-      id: instance.id,
+      id: instance.uuid,
       text: instance.prompt,
       type: instance.type,
       response: instance.response as T,
@@ -13,7 +13,7 @@ export class LineItemMapper {
 
   static toInstance<T>(domain: LineItem<T>): LineItemInstance {
     const instance = new LineItemInstance();
-    instance.id = domain.id;
+    instance.uuid = domain.id;
     instance.prompt = domain.text;
     instance.type = domain.type;
     instance.response = domain.response as any; // Cast to any for storage

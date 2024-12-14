@@ -5,7 +5,7 @@ import { LineItemMapper } from './line-item.mapper';
 export class ChartReviewMapper {
   static toDomain(instance: AuditInstance): ChartReviewAudit {
     return new ChartReviewAudit(
-      instance.id,
+      instance.uuid,
       instance.assignedTo,
       instance.dueDate,
       instance.status,
@@ -18,7 +18,7 @@ export class ChartReviewMapper {
 
   static toInstance(domain: ChartReviewAudit): AuditInstance {
     const instance = new AuditInstance();
-    instance.id = domain.id;
+    instance.uuid = domain.uuid;
     instance.assignedTo = domain.assignedTo;
     instance.dueDate = domain.dueDate;
     instance.auditType = domain.auditType;

@@ -1,13 +1,20 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { LineItemType } from '../../../domain/types/line-item-type.enum';
 import { AuditInstance } from './audit.instance';
 
 @Entity('line_items')
 export class LineItemInstance {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  uuid: string;
 
-  @Column()
+  @Column({ type: 'text' })
   prompt: string;
 
   @Column({ type: 'text' })
@@ -29,4 +36,10 @@ export class LineItemInstance {
 
   @Column()
   auditId: string;
+
+  @CreateDateColumn({ type: 'timestamp' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ type: 'timestamp' })
+  updatedAt: Date;
 }
