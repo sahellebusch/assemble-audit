@@ -15,7 +15,7 @@ export class ChartReviewRepository {
 
   async findById(id: string): Promise<ChartReviewAudit | null> {
     const instance = await this.auditRepository.findOne({
-      where: { id, auditType: AuditType.ChartReview },
+      where: { uuid: id, auditType: AuditType.ChartReview },
       relations: ['lineItems'],
     });
 
@@ -37,7 +37,7 @@ export class ChartReviewRepository {
     audit: Partial<ChartReviewAudit>,
   ): Promise<ChartReviewAudit> {
     const instance = await this.auditRepository.findOne({
-      where: { id, auditType: AuditType.ChartReview },
+      where: { uuid: id, auditType: AuditType.ChartReview },
       relations: ['lineItems'],
     });
 
