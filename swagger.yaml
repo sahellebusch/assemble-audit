@@ -244,12 +244,28 @@ paths:
           in: query
           description: Filter compliance rates by unit ID
           schema:
+            example: 123e4567-e89b-12d3-a456-426614174000
             type: string
         - name: assignedTo
           required: false
           in: query
           description: Filter compliance rates by assigned user ID
           schema:
+            example: user-123e4567-e89b-12d3-a456-426614174000
+            type: string
+        - name: startDate
+          required: true
+          in: query
+          description: Start date for the compliance query
+          schema:
+            example: 2023-01-01
+            type: string
+        - name: endDate
+          required: true
+          in: query
+          description: End date for the compliance query
+          schema:
+            example: 2023-12-31
             type: string
       responses:
         '200':
@@ -399,13 +415,16 @@ components:
       properties:
         id:
           type: string
+          example: 123e4567-e89b-12d3-a456-426614174000
           description: Unique identifier of the audit
         assignedTo:
           type: string
+          example: user-123e4567-e89b-12d3-a456-426614174000
           description: User ID the audit is assigned to
         dueDate:
           format: date-time
           type: string
+          example: 2023-12-31T23:59:59Z
           description: Due date for the audit
         auditType:
           type: string

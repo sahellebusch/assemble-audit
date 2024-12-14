@@ -37,27 +37,39 @@ export class RecurrenceDto {
   endDate?: Date;
 }
 
+const EXAMPLE_UUID = '123e4567-e89b-12d3-a456-426614174000';
+
 export class CreateAuditDto {
+  @ApiProperty({
+    example: EXAMPLE_UUID,
+    description: 'Unique identifier for the audit',
+  })
+  id: string;
+
+  @ApiProperty({
+    example: 'user-123e4567-e89b-12d3-a456-426614174000',
+    description: 'User ID the audit is assigned to',
+  })
   @IsNotEmpty()
   @IsUUID()
-  @ApiProperty({ description: 'User ID the audit is assigned to' })
   public readonly assignedTo: string;
 
-  @IsNotEmpty()
-  @IsEnum(AuditType)
   @ApiProperty({
-    enum: AuditType,
-    description: 'Type of audit to be created',
+    example: '2023-12-31T23:59:59Z',
+    description: 'Due date for the audit',
   })
-  public readonly auditType: AuditType;
-
   @IsNotEmpty()
   @IsDateString()
-  @ApiProperty({
-    description: 'Due date for the audit',
-    type: Date,
-  })
   public readonly dueDate: Date;
+
+  @ApiProperty({
+    example: AuditType.ChartReview,
+    enum: AuditType,
+    description: 'Type of the audit',
+  })
+  @IsNotEmpty()
+  @IsEnum(AuditType)
+  public readonly auditType: AuditType;
 
   @IsOptional()
   @IsString()

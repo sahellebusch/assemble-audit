@@ -1,14 +1,8 @@
 import { Controller, Get, Query } from '@nestjs/common';
-import {
-  ApiOperation,
-  ApiTags,
-  ApiOkResponse,
-  ApiQuery,
-} from '@nestjs/swagger';
+import { ApiOperation, ApiTags, ApiOkResponse } from '@nestjs/swagger';
 import { AuditFindAllDto } from '../dtos/audit-find-all.dto';
 import { GetAuditsService } from '../services/get-audits.service';
 import { AuditComplianceDto } from '../dtos/audit-compliance.dto';
-import { AuditType } from '../../domain/types/audit-types.enum';
 import { GetAuditComplianceQuery } from '../dtos/get-audit-compliance.query';
 
 @ApiTags('Audits')

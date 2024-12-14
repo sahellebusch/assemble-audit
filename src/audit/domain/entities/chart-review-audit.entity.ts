@@ -1,7 +1,6 @@
 import { AuditBase } from './audit-base.entity';
 import { AuditStatus } from '../types/audit-status.enum';
 import { AuditType } from '../types/audit-types.enum';
-import { LineItem } from './line-item.entity';
 
 export class ChartReviewAudit extends AuditBase {
   readonly ehrProvider: string;
@@ -17,7 +16,6 @@ export class ChartReviewAudit extends AuditBase {
     assignedTo: string,
     dueDate: Date,
     status: AuditStatus,
-    lineItems: LineItem[],
     ehrProvider: string,
     patientId: string,
     ehrData?: {
@@ -26,7 +24,7 @@ export class ChartReviewAudit extends AuditBase {
       providerId: string;
     },
   ) {
-    super(id, assignedTo, dueDate, AuditType.ChartReview, status, lineItems);
+    super(id, assignedTo, dueDate, AuditType.ChartReview, status);
     this.ehrProvider = ehrProvider;
     this.patientId = patientId;
     this.ehrData = ehrData;
@@ -37,14 +35,12 @@ export class ChartReviewAudit extends AuditBase {
     dueDate: Date,
     ehrProvider: string,
     patientId: string,
-    lineItems: LineItem[],
   ): ChartReviewAudit {
     return new ChartReviewAudit(
       crypto.randomUUID(),
       assignedTo,
       dueDate,
       AuditStatus.Pending,
-      lineItems,
       ehrProvider,
       patientId,
     );

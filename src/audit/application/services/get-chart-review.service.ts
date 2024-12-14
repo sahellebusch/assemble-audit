@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ChartReviewAudit } from '../../domain/entities/chart-review-audit.entity';
 import { AuditNotFoundError } from '../../domain/errors/audit-not-found.error';
 import { ChartReviewRepository } from '../../infra/repositories/chart-review.repository';
-import { EHRService } from '../../../../ehr/application/services/ehr.service';
+import { EHRService } from '../../../ehr/application/services/ehr.service';
 
 @Injectable()
 export class GetChartReviewService {
