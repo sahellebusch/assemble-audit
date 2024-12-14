@@ -37,6 +37,7 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   if (configService.get<string>('APP_ENV') === 'local') {
+    console.log('Generating swagger.yaml file');
     const yamlString = yaml.stringify(document);
     const filePath = path.resolve(process.cwd(), 'swagger.yaml');
     fs.writeFileSync(filePath, yamlString, 'utf8');

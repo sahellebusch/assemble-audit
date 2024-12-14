@@ -104,28 +104,35 @@ paths:
                       additionalProperties: true
       tags:
         - health-check
-  /api/1/audits:
+  /api/1/audits/chart-reviews:
     post:
-      operationId: AuditV1Controller_createAudit_api/1
+      description:
+        Creates a new chart review audit with EHR provider and patient
+        information
+      operationId: ChartReviewController_createChartReview_api/1
       parameters: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateAuditDto'
+              $ref: '#/components/schemas/CreateChartReviewAuditDto'
       responses:
         '201':
-          description: Audit created and assigned successfully
+          description: Chart reviews created successfully
           content:
             application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/ChartReviewResponseDto'
+        '400':
+          description: Invalid input data provided
+      summary: Create a new chart reviews
       tags: &a4
-        - Audits
-  /api/1/audits/{id}:
+        - Chart Review
+  /api/1/audits/chart-reviews/{id}:
     get:
-      operationId: AuditV1Controller_getAudit_api/1
+      description: Retrieves a chart review audit including EHR data if available
+      operationId: ChartReviewController_getChartReview_api/1
       parameters:
         - name: id
           required: true
@@ -134,15 +141,18 @@ paths:
             type: string
       responses:
         '200':
-          description: ''
+          description: Chart review audit retrieved successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuditResponseDto'
-      summary: Get an audit by ID
+                $ref: '#/components/schemas/ChartReviewResponseDto'
+        '404':
+          description: Chart review audit not found
+      summary: Get a chart review audit
       tags: *a4
     patch:
-      operationId: AuditV1Controller_updateAudit_api/1
+      description: Updates a chart review audit status and/or line item responses
+      operationId: ChartReviewController_updateChartReview_api/1
       parameters:
         - name: id
           required: true
@@ -154,16 +164,98 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateAuditDto'
+              $ref: '#/components/schemas/UpdateChartReviewDto'
       responses:
         '200':
-          description: Audit updated successfully
+          description: The chart review audit has been successfully updated
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuditResponseDto'
-      summary: Update audit status and/or line item responses
+                $ref: '#/components/schemas/ChartReviewResponseDto'
+        '400':
+          description: Invalid update data provided
+        '404':
+          description: Chart review audit not found
+      summary: Update a chart review audit
       tags: *a4
+  /api/1/audits/chart-reviews/compliance:
+    get:
+      description:
+        Retrieves compliance rates and statistics for chart review audits,
+        including total audits, compliant audits, compliance rate, completed
+        audits and completion rate. Can be filtered by EHR provider.
+      operationId: ChartReviewController_getCompliance_api/1
+      parameters:
+        - name: assignedTo
+          required: false
+          in: query
+          description: Filter by assigned user ID
+          schema:
+            type: string
+        - name: unit
+          required: false
+          in: query
+          description: Filter by unit ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Compliance statistics retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChartReviewComplianceDto'
+      summary: Get chart review compliance rates
+      tags: *a4
+  /api/1/audits:
+    get:
+      description: Retrieves a list of all audits with basic information
+      operationId: AuditV1Controller_getAudits_api/1
+      parameters: []
+      responses:
+        '200':
+          description: List of audits retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AuditFindAllDto'
+      summary: Get all audits
+      tags: &a5
+        - Audits
+  /api/1/audits/compliance:
+    get:
+      description: Retrieves compliance rates for audits with optional filters
+      operationId: AuditV1Controller_getCompliance_api/1
+      parameters:
+        - name: type
+          required: false
+          in: query
+          description: Filter compliance rates by audit type
+          schema:
+            enum:
+              - chart-review
+              - practice-audit
+              - safety-audit
+            type: string
+        - name: unitId
+          required: false
+          in: query
+          description: Filter compliance rates by unit ID
+          schema:
+            type: string
+        - name: assignedTo
+          required: false
+          in: query
+          description: Filter compliance rates by assigned user ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+      summary: Get audit compliance rates
+      tags: *a5
 info:
   title: API Documentation
   description: API description
@@ -179,12 +271,12 @@ components:
         frequency:
           type: string
           enum:
-            - DAILY
-            - WEEKLY
-            - MONTHLY
-            - QUARTERLY
-            - YEARLY
-          description: Frequency of recurrence
+            - daily
+            - weekly
+            - monthly
+            - quarterly
+            - yearly
+          description: Frequency of recurrence. Optional if audit is not recurring.
         interval:
           type: number
           description: Interval of recurrence (e.g., every 2 weeks)
@@ -194,124 +286,142 @@ components:
           type: string
           description: Optional end date for recurrence
       required:
-        - frequency
         - interval
-    CreateAuditDto:
+    CreateChartReviewAuditDto:
       type: object
       properties:
         assignedTo:
           type: string
+          description:
+            User ID the chart review is assigned to. Required if no unitId
+            provided
+        unitId:
+          type: string
+          description:
+            Unit ID to assign the chart review to. Required if no assignedTo
+            provided
+        dueDate:
+          format: date-time
+          type: string
+          description: Due date for the chart review
+        ehrProvider:
+          type: string
+          description: ID of the EHR provider for the chart review
+        patientId:
+          type: string
+          description: ID of the patient whose chart is being reviewed
+        recurrence:
+          description: Recurrence pattern for the chart review
+          allOf:
+            - $ref: '#/components/schemas/RecurrenceDto'
+      required:
+        - dueDate
+        - ehrProvider
+        - patientId
+    ChartReviewResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+        assignedTo:
+          type: string
+        dueDate:
+          format: date-time
+          type: string
+        ehrProvider:
+          type: string
+        patientId:
+          type: string
+        status:
+          type: string
+        ehrData:
+          type: object
+        lineItems:
+          type: array
+          items:
+            type: string
+      required:
+        - id
+        - assignedTo
+        - dueDate
+        - ehrProvider
+        - patientId
+        - status
+        - lineItems
+    UpdateLineItemDto:
+      type: object
+      properties: {}
+    UpdateChartReviewDto:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - pending
+            - in-progress
+            - completed
+          description: Updated status of the chart review audit
+        lineItems:
+          description: Updated responses for line items
+          type: array
+          items:
+            $ref: '#/components/schemas/UpdateLineItemDto'
+    ChartReviewComplianceDto:
+      type: object
+      properties:
+        totalAudits:
+          type: number
+          description: Total number of audits
+        compliantAudits:
+          type: number
+          description: Number of compliant audits
+        complianceRate:
+          type: number
+          description: Compliance rate as a percentage
+          minimum: 0
+          maximum: 100
+        completedAudits:
+          type: number
+          description: Number of completed audits
+        completionRate:
+          type: number
+          description: Completion rate as a percentage
+          minimum: 0
+          maximum: 100
+      required:
+        - totalAudits
+        - compliantAudits
+        - complianceRate
+        - completedAudits
+        - completionRate
+    AuditFindAllDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the audit
+        assignedTo:
+          type: string
           description: User ID the audit is assigned to
+        dueDate:
+          format: date-time
+          type: string
+          description: Due date for the audit
         auditType:
           type: string
           enum:
             - chart-review
             - practice-audit
             - safety-audit
-          description: Type of audit to be created
-        dueDate:
-          format: date-time
+        status:
           type: string
-          description: Due date for the audit
-        providerId:
-          type: string
-          description: ID of the provider associated with the audit
-        patientId:
-          type: string
-          description: ID of the patient associated with the audit
-        recurrence:
-          description: Recurrence pattern for the audit
-          allOf:
-            - $ref: '#/components/schemas/RecurrenceDto'
+          enum:
+            - pending
+            - in-progress
+            - completed
       required:
+        - id
         - assignedTo
+        - dueDate
         - auditType
-        - dueDate
-    LineItemResponseDto:
-      type: object
-      properties:
-        id:
-          type: string
-        prompt:
-          type: string
-        type:
-          type: string
-          enum:
-            - boolean
-            - text
-            - number
-            - multi_choice
-        response:
-          type: boolean
-          nullable: true
-        comment:
-          type: string
-          nullable: true
-        answeredAt:
-          format: date-time
-          type: string
-          nullable: true
-      required:
-        - id
-        - prompt
-        - type
-        - response
-        - comment
-        - answeredAt
-    AuditResponseDto:
-      type: object
-      properties:
-        id:
-          type: string
-        assignedTo:
-          type: string
-        dueDate:
-          format: date-time
-          type: string
-        status:
-          type: string
-          enum:
-            - pending
-            - in-progress
-            - completed
-        lineItems:
-          type: array
-          items:
-            $ref: '#/components/schemas/LineItemResponseDto'
-        createdAt:
-          format: date-time
-          type: string
-        updatedAt:
-          format: date-time
-          type: string
-      required:
-        - id
-        - assignedTo
-        - dueDate
         - status
-        - lineItems
-        - createdAt
-        - updatedAt
-    UpdateLineItemDto:
-      type: object
-      properties:
-        id:
-          type: string
-        response:
-          type: string
-      required:
-        - id
-        - response
-    UpdateAuditDto:
-      type: object
-      properties:
-        status:
-          type: string
-          enum:
-            - pending
-            - in-progress
-            - completed
-        lineItems:
-          type: array
-          items:
-            $ref: '#/components/schemas/UpdateLineItemDto'
