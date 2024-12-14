@@ -4,9 +4,10 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "${PORT:-3000}:3000"
+      - '${PORT:-3000}:3000'
     environment:
-      - NODE_ENV=local
+      - NODE_ENV=development
+      - APP_ENV=local
       - DATABASE_HOST=postgres
       - DATABASE_PORT=5432
       - DATABASE_USERNAME=username
@@ -16,12 +17,13 @@ services:
       - postgres
     volumes:
       - .:/usr/src/app
+      - ./swagger.yaml:/usr/src/app/swagger.yaml
     command: npm run start:dev
 
   postgres:
     image: postgres:17-alpine
     ports:
-      - "5432:5432"
+      - '5432:5432'
     environment:
       - POSTGRES_USER=username
       - POSTGRES_PASSWORD=password
@@ -30,4 +32,4 @@ services:
       - ./tmp/postgres_data:/var/lib/postgresql/data
 
 volumes:
-  postgres_data: 
+  postgres_data:
