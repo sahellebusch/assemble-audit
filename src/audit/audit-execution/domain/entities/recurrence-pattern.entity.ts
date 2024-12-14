@@ -1,4 +1,4 @@
-import { RecurrenceFrequency } from '../../infra/db/table/recurrence-pattern.entity';
+import { RecurrenceFrequency } from '../types/recurrence-frequency.enum';
 
 export class RecurrencePattern {
   constructor(
@@ -7,8 +7,8 @@ export class RecurrencePattern {
     public readonly endDate?: Date,
   ) {}
 
-  calculateNextDate(currentDate: Date): Date {
-    const nextDate = new Date(currentDate);
+  calculateNextDate(fromDate: Date): Date {
+    const nextDate = new Date(fromDate);
 
     switch (this.frequency) {
       case RecurrenceFrequency.DAILY:
@@ -31,8 +31,11 @@ export class RecurrencePattern {
     return nextDate;
   }
 
-  hasEnded(currentDate: Date): boolean {
-    if (!this.endDate) return false;
-    return currentDate >= this.endDate;
+  hasEnded(): boolean {
+    if (!this.endDate) {
+      return false;
+    }
+
+    return new Date() >= this.endDate;
   }
 }

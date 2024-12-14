@@ -17,6 +17,6 @@ export class LineItem<T = any> {
   }
 
   isAnswered(): boolean {
-    return this.response != null;
+    return !!this.response;
   }
 }

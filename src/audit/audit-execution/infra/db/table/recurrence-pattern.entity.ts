@@ -6,14 +6,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { AuditInstance } from './audit.instance';
-
-export enum RecurrenceFrequency {
-  DAILY = 'DAILY',
-  WEEKLY = 'WEEKLY',
-  MONTHLY = 'MONTHLY',
-  QUARTERLY = 'QUARTERLY',
-  YEARLY = 'YEARLY',
-}
+import { RecurrenceFrequency } from '../../../domain/types/recurrence-frequency.enum';
 
 @Entity('recurrence_patterns')
 export class RecurrencePatternInstance {

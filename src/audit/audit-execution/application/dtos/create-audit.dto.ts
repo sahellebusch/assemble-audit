@@ -11,7 +11,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { RecurrenceFrequency } from '../../infra/db/table/recurrence-pattern.entity';
+import { RecurrenceFrequency } from '../../domain/types/recurrence-frequency.enum';
 
 export class RecurrenceDto {
   @IsEnum(RecurrenceFrequency)

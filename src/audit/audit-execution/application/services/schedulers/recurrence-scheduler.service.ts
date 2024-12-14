@@ -29,11 +29,11 @@ export class RecurrenceSchedulerService {
       recurrence.endDate,
     );
 
-    if (pattern.hasEnded(new Date())) {
+    if (pattern.hasEnded()) {
       return;
     }
 
-    // Create next audit
+    // Create and schedule next audit
     await this.auditCreateService.createAudit({
       assignedTo: recurrence.audit.assignedTo,
       auditType: recurrence.audit.auditType,
