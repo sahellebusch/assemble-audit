@@ -3,12 +3,12 @@ import { LineItemInstance } from '../db/table/line-item.instance';
 
 export class LineItemMapper {
   static toDomain<T>(instance: LineItemInstance): LineItem<T> {
-    return new LineItem<T>(
-      instance.id,
-      instance.prompt,
-      instance.type,
-      instance.response as T,
-    );
+    return new LineItem<T>({
+      id: instance.id,
+      text: instance.prompt,
+      type: instance.type,
+      response: instance.response as T,
+    });
   }
 
   static toInstance<T>(domain: LineItem<T>): LineItemInstance {

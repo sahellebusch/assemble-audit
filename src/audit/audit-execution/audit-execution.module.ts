@@ -1,41 +1,28 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuditInstance } from './infra/db/table/audit.instance';
-import { EHRModule } from '../../ehr/ehr.module';
-import { AuditMapper } from './infra/mappers/audit.mapper';
-import { AuditRepository } from './infra/repositories/audit.repository';
-import { AuditFactory } from './domain/factories/audit.factory';
 import { LineItemInstance } from './infra/db/table/line-item.instance';
+import { ChartReviewController as ChartReviewV1Controller } from './application/controllers/chart-review.controller';
+import { CreateChartReviewService } from './application/services/create-chart-review.service';
+import { GetChartReviewService } from './application/services/get-chart-review.service';
+import { ChartReviewRepository } from './infra/repositories/chart-review.repository';
+import { EHRModule } from '../../ehr/ehr.module';
+import { UpdateChartReviewService } from './application/services/update-chart-review.service';
+import { GetAuditsService } from './application/services/get-audits.service';
 import { AuditV1Controller } from './application/controllers/audit.controller';
-import { LineItemMapper } from './infra/mappers/line-item.mapper';
-import { AuditCreateService } from './application/services/audit-create.service';
-import { GetAuditService } from './application/services/get-audit.service';
-import { RecurrencePatternInstance } from './infra/db/table/recurrence-pattern.entity';
-import { AuditUpdateService } from './application/services/audit-update.service';
-import { LineItemRepository } from './infra/repositories/line-item.repository';
-import { RecurrenceSchedulerService } from './application/services/schedulers/recurrence-scheduler.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      AuditInstance,
-      LineItemInstance,
-      RecurrencePatternInstance,
-    ]),
+    TypeOrmModule.forFeature([AuditInstance, LineItemInstance]),
     EHRModule,
   ],
-  controllers: [AuditV1Controller],
+  controllers: [ChartReviewV1Controller, AuditV1Controller],
   providers: [
-    AuditMapper,
-    AuditRepository,
-    AuditFactory,
-    LineItemMapper,
-    AuditCreateService,
-    GetAuditService,
-    AuditUpdateService,
-    LineItemRepository,
-    RecurrenceSchedulerService,
+    ChartReviewRepository,
+    CreateChartReviewService,
+    GetChartReviewService,
+    UpdateChartReviewService,
+    GetAuditsService,
   ],
-  exports: [AuditCreateService, AuditUpdateService],
 })
 export class AuditExecutionModule {}
